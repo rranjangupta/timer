@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flip Clock</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url('assets/img/bg.png') no-repeat center center/cover;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .flip-clock {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .flip-unit {
+            position: relative;
+            width: 80px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-digit {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden;
+            transform-origin: bottom;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .flip-digit.flipping {
+            animation: flip 0.6s forwards;
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateX(0);
+            }
+            50% {
+                transform: rotateX(-90deg);
+            }
+            100% {
+                transform: rotateX(-180deg);
+            }
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .flip-unit {
+                width: 60px;
+                height: 80px;
+                font-size: 1.5rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Your Time Together</h1>
+<div class="flip-clock">
+    <div class="flip-unit" id="years">
+        <div class="flip-digit" id="yearsDigit">00</div>
+    </div>
+    <div class="flip-unit" id="months">
+        <div class="flip-digit" id="monthsDigit">00</div>
+    </div>
+    <div class="flip-unit" id="weeks">
+        <div class="flip-digit" id="weeksDigit">00</div>
+    </div>
+    <div class="flip-unit" id="days">
+        <div class="flip-digit" id="daysDigit">00</div>
+    </div>
+    <div class="flip-unit" id="hours">
+        <div class="flip-digit" id="hoursDigit">00</div>
+    </div>
+    <div class="flip-unit" id="minutes">
+        <div class="flip-digit" id="minutesDigit">00</div>
+    </div>
+    <div class="flip-unit" id="seconds">
+        <div class="flip-digit" id="secondsDigit">00</div>
+    </div>
+</div>
+<button id="startButton">Start Counting</button>
+
+<script>
+    const startButton = document.getElementById('startButton');
+
+    let startTime;
+    let interval;
+
+    function updateDigit(id, value) {
+        const digitElement = document.getElementById(id);
+        if (digitElement.textContent !== value.toString().padStart(2, '0')) {
+            digitElement.classList.add('flipping');
+            setTimeout(() => {
+                digitElement.textContent = value.toString().padStart(2, '0');
+                digitElement.classList.remove('flipping');
+            }, 300);
+        }
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const elapsed = new Date(now - startTime);
+
+        const years = elapsed.getUTCFullYear() - 1970;
+        const months = elapsed.getUTCMonth();
+        const days = elapsed.getUTCDate() - 1;
+        const weeks = Math.floor(days / 7);
+        const remainingDays = days % 7;
+        const hours = elapsed.getUTCHours();
+        const minutes = elapsed.getUTCMinutes();
+        const seconds = elapsed.getUTCSeconds();
+
+        updateDigit('yearsDigit', years);
+        updateDigit('monthsDigit', months);
+        updateDigit('weeksDigit', weeks);
+        updateDigit('daysDigit', remainingDays);
+        updateDigit('hoursDigit', hours);
+        updateDigit('minutesDigit', minutes);
+        updateDigit('secondsDigit', seconds);
+    }
+
+    startButton.addEventListener('click', () => {
+        if (!interval) {
+            startTime = new Date();
+            interval = setInterval(updateClock, 1000);
+            startButton.disabled = true;
+            startButton.textContent = 'Done for life';
+        }
+    });
+</script>
+</body>
+</html>
